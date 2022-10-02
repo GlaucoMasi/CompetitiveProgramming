@@ -53,10 +53,3 @@ long long fuggi(int N, int M, vector <int> A, vector <int> B, vector
 
   return dist[0];
 }
-
-int main() {
-  int n, m; fin >> n >> m;
-  vector <int> A(m), B(m), T(m), R(m);
-  for(int i = 0; i < m; i++) fin >> A[i] >> B[i] >> T[i] >> R[i];
-  fout << fuggi(n, m, A, B, T, R);
-}
