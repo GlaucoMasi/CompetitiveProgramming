@@ -11,8 +11,9 @@ extern int travel_plan(int N, int M, int R[][2], int L[], int K, int P[]){
     g[R[i][0]].push_back({R[i][1], L[i]});
     g[R[i][1]].push_back({R[i][0], L[i]});
   }
-
+  
   vector<int> vis(N, 0);
+  vector<pair<int, int>> dist(N, {1e9, 1e9});
   priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
 
   for(int i = 0; i < K; i++){
@@ -21,7 +22,7 @@ extern int travel_plan(int N, int M, int R[][2], int L[], int K, int P[]){
   }
 
   while(!pq.empty()){
-    int dist = pq.top().first, node = pq.top().second;
+    int d = pq.top().first, node = pq.top().second;
     pq.pop();
 
     if(vis[node] == 0){
@@ -29,13 +30,19 @@ extern int travel_plan(int N, int M, int R[][2], int L[], int K, int P[]){
       continue;
     }else if(vis[node] == 2) continue;
 
-    if(node == 0) return dist;
+    if(node == 0) return d;
     vis[node]++;
 
     for(auto i : g[node]){
-      pq.push({dist+i.second, i.first});
+      if(dist[i.first].second < d+i.second) continue;
+      else if(dist[i.first].first > d+i.second){
+        dist[i.first].second = dist[i.first].first;
+        dist[i.first].first = d+i.second;
+      }else{
+        dist[i.first].second = d+i.second;
+      }
+
+      pq.push({d+i.second, i.first});
     }
   }
-
-  return 0;
 }
