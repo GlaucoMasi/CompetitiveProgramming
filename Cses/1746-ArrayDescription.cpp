@@ -1,25 +1,32 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-int n, m;
-vector<int> v;
+int main() {
+  int mod = 1e9 + 7;
+  int n, m; cin >> n >> m;
+  vector<int> v(n);
+  for(auto &i : v) cin >> i;
+  vector<vector<int>> memo(n, vector<int>(m+1, 0));
 
-int f(int i, int last){
-  if(i == n) return 1;
-  if(v[i] != 0){ 
-    if(abs(v[i]-last) > 1) return 0;
-    else return f(i+1, v[i]);
+  long long sum = 0;
+  for(int i = 1; i <= m; i++){
+    if(v[0] == i || v[0] == 0) memo[0][i] = 1;
+    if(n-1 == 0) sum = (sum + memo[0][i]) % mod;
   }
 
-  int ans = 0;
-  for(int k = max(1, last-1); k <= last+1 && k <= m; k++) ans += f(i+1, k);
-  return ans;
-}
+  for(int i = 1; i < n; i++){
+    for(int j = 1; j <= m; j++){
+      if(v[i] != 0 && j != v[i]) continue;
+      long long ans = 0;
 
-int main() {
-  cin >> n >> m;
-  v.resize(n);
-  for(auto &i : v) cin >> i;
+      if(j+1 <= m) ans += memo[i-1][j+1];
+      if(j-1 >= 1) ans += memo[i-1][j-1];
+      ans += memo[i-1][j];
 
-  cout << f(0, v[0]);
+      memo[i][j] = ans % mod;
+      if(n-1 == i) sum = (sum + memo[i][j]) % mod;
+    }
+  }
+
+  cout << sum;
 }
