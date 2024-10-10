@@ -32,13 +32,13 @@ int main() {
       string ans = "";
 
       while(x != start.first || y != start.second){
-        if(father[x][y] == -1) ans += 'U';
-        else if(father[x][y] == 1) ans += 'D';
-        else if(father[x][y] == -2) ans += 'L';
-        else if(father[x][y] == 2) ans += 'R';
-          
-        if(father[x][y] % 2 == 0) y -= (father[x][y]/2);
-        else x -= father[x][y];
+      if(father[x][y] == -1) ans += 'U';
+      else if(father[x][y] == 1) ans += 'D';
+      else if(father[x][y] == -2) ans += 'L';
+      else if(father[x][y] == 2) ans += 'R';
+        
+      if(father[x][y] % 2 == 0) y -= (father[x][y]/2);
+      else x -= father[x][y];
       }
 
       cout << "YES" << endl << ans.size() << endl;

@@ -16,7 +16,6 @@ long long f(int i){
   for(auto j : v[i]){
     best = max(best, f(j.first+1) + j.second);
   }
-  
   best = max(best, f(i+1));
 
   return memo[i] = best;
