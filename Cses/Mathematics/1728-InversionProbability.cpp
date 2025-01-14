@@ -3,6 +3,33 @@ using namespace std;
 ifstream fin("input.txt");
 ofstream fout("output.txt");
 
+/*
+Python version for precision issues:
+from decimal import Decimal, getcontext, ROUND_HALF_EVEN
+getcontext().prec = 50
+
+def sum(i):
+    return i*(i-1)//2;
+
+def main():
+    n = int(input().strip())
+    v = list(map(Decimal, input().split()))
+    
+    ans = Decimal(0)
+    
+    for j in range(n):
+        for i in range(j):
+            curr = Decimal(0)
+            curr += sum(Decimal(v[i]))-sum(Decimal(v[i]-min(v[i], v[j])))
+            ans += curr/(v[i]*v[j])
+    
+    ans = ans.quantize(Decimal("0.000000"), rounding=ROUND_HALF_EVEN)
+    print(ans)
+
+if __name__ == "__main__":
+    main()
+*/
+
 int main() {
   ios::sync_with_stdio(0); cin.tie(0); cout.tie(0);
 
