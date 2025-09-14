@@ -5,8 +5,7 @@ ofstream fout("output.txt");
 
 vector<vector<pair<int, pair<int, int>>>> g;
 
-long long fuggi(int N, int M, vector <int> A, vector <int> B, vector
-<int> T, vector <int> R){
+long long fuggi(int N, int M, vector <int> A, vector <int> B, vector<int> T, vector <int> R){
   g.resize(N);
   for(int i = 0; i < M; i++){
     g[B[i]].push_back({A[i], {T[i], R[i]}});
