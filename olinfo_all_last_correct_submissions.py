@@ -1,6 +1,42 @@
-import json, requests, re, html
+import json, requests, re, html, time
 from typing import TypedDict
 from pathlib import Path
+
+# --- minimal retry wrapper (avoids read/SSL timeouts) ---
+def get_with_retry(
+    url: str,
+    *,
+    headers: dict | None = None,
+    cookies: dict | None = None,
+    timeout: tuple[float, float] = (8.0, 120.0),  # (connect, read)
+    retries: int = 5,
+    backoff: float = 1.6
+) -> requests.Response:
+    """
+    Minimal GET with retries on timeouts/connection errors and 429/5xx.
+    Keeps your logic identical otherwise.
+    """
+    last_exc = None
+    for attempt in range(retries):
+        try:
+            resp = requests.get(url, headers=headers, cookies=cookies, timeout=timeout)
+            if resp.status_code in (429, 500, 502, 503, 504):
+                # transient server or rate-limit -> retry
+                last_exc = RuntimeError(f"HTTP {resp.status_code}")
+                raise last_exc
+            return resp
+        except (requests.Timeout, requests.ConnectionError) as e:
+            last_exc = e
+        except RuntimeError as e:
+            last_exc = e
+
+        # exponential backoff
+        if attempt < retries - 1:
+            time.sleep(backoff ** attempt)
+    # out of retries
+    if isinstance(last_exc, Exception):
+        raise last_exc
+    raise RuntimeError("GET failed after retries")
 
 
 
@@ -37,7 +73,7 @@ _PATTERN = re.compile(
 
 def get_solved_tasks(username: str = "Glauco"):
     url = f"https://training.olinfo.it/user/{username}"
-    res = requests.get(url, cookies=cookie_dict(), timeout=30)
+    res = get_with_retry(url, cookies=cookie_dict())
     raw = res.text
     
     risultati = []
@@ -69,7 +105,7 @@ def get_code(entry: Task):
     shortname = entry["shortname"]
 
     url = f"https://training.olinfo.it/{prefisso}/{shortname}/submissions"
-    res = requests.get(url, cookies=cookie_dict(), timeout=30)
+    res = get_with_retry(url, cookies=cookie_dict())
     raw = res.text
 
     pref = re.escape(prefisso.strip("/"))
@@ -159,7 +195,7 @@ def save_submission(entry: Codice):
     code = entry["code"]
 
     url = f"https://training.olinfo.it/{prefisso}/{shortname}/submissions/{code}"
-    res = requests.get(url, headers=browserish_headers(shortname, code), cookies=cookie_dict(), timeout=30)
+    res = get_with_retry(url, headers=browserish_headers(shortname, code), cookies=cookie_dict())
     raw = res.text
 
     code, ext = extract_code_and_ext(raw)
