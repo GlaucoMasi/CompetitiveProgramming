@@ -6,6 +6,8 @@ __pycache__
 *.txt
 grader.cpp
 
+.vscode
+
 src/olinfo/ctf.cpp
 src/olinfo/museo.cpp
 src/olinfo/abc_rsa.cpp
